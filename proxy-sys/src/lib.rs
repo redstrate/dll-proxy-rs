@@ -15,7 +15,6 @@
 //! This crate is pretty unsafe
 
 #![feature(naked_functions)]
-#![feature(asm_const)]
 #![deny(
     missing_debug_implementations,
     missing_docs,

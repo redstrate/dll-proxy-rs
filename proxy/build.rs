@@ -14,8 +14,5 @@ fn main() {
     use std::path::Path;
     let lib_path = Path::new("deps").join("Exports.def");
     let absolute_path = std::fs::canonicalize(&lib_path).unwrap();
-    println!(
-        "cargo:rustc-cdylib-link-arg={}",
-        absolute_path.display()
-    );
+    println!("cargo:rustc-cdylib-link-arg={}", absolute_path.display());
 }
