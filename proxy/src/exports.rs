@@ -13,13 +13,13 @@ use winapi::{
     um::libloaderapi::{GetProcAddress, LoadLibraryA},
 };
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 static mut OriginalFuncs_version: [FARPROC; 17] = [0 as FARPROC; 17];
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 static mut OriginalFuncs_winhttp: [FARPROC; 65] = [0 as FARPROC; 65];
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 static mut OriginalFuncs_winmm: [FARPROC; 181] = [0 as FARPROC; 181];
 
 #[cfg(target_pointer_width = "64")]

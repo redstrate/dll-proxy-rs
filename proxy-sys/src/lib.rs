@@ -30,7 +30,7 @@
 #![allow(clippy::inherent_to_string, clippy::type_complexity, improper_ctypes)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-use syn::__private::{quote::quote, TokenStream};
+use syn::__private::{TokenStream, quote::quote};
 
 /// Wraps your function in DllMain on windows, and passes #[ctor] on linux.
 ///

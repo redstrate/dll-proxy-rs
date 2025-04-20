@@ -2,7 +2,7 @@
 name = "proxy-sys"
 version = "0.2.2"
 authors = ["RinLovesYou"]
-edition = "2021"
+edition = "2024"
 description = "A dynamic Windows System DLL proxy"
 repository = "https://github.com/RinLovesYou/dll-proxy-rs"
 license = "GPL-2.0"
