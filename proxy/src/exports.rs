@@ -52,6 +52,20 @@ pub enum ExportError {
     GetModuleFileNameWFailed,
 }
 
+impl std::fmt::Display for ExportError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let msg = match self {
+            Self::LibraryNotFound => "Failed to find original library",
+            Self::LoadLibrary => "Failed to load library",
+            Self::GetModulePath => "Failed to get module path",
+            Self::GetModuleName => "Failed to get module name",
+            Self::InvalidFileName => "Proxy has an invalid file name",
+            Self::GetModuleFileNameWFailed => "GetModuleFileNameW failed"
+        };
+        write!(f, "{}", msg)
+    }
+}
+
 const EXPORTS_VERSION: [&'static [u8]; 17] = [
     b"GetFileVersionInfoA\0",
     b"GetFileVersionInfoByHandle\0",
