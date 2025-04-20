@@ -66,9 +66,9 @@ pub fn proxy(_attribute: TokenStream, function: TokenStream) -> TokenStream {
             #[allow(non_snake_case)]
             pub extern "system" fn DllMain(
                 _hinstDLL: proxy_dll::HINSTANCE,
-                fdwReason: proxy_dll::DWORD,
-                _lpvReserved: proxy_dll::LPVOID,
-            ) -> proxy_dll::BOOL {
+                fdwReason: u32,
+                _lpvReserved: *const c_void,
+            ) -> u8 {
 
                 if fdwReason == proxy_dll::DLL_PROCESS_ATTACH {
                     //call the original function
@@ -77,7 +77,7 @@ pub fn proxy(_attribute: TokenStream, function: TokenStream) -> TokenStream {
                     });
                     #ident();
                 }
-                proxy_dll::TRUE
+                1
             }
 
         );

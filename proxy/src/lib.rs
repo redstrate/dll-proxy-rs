@@ -45,3 +45,7 @@
 pub mod exports;
 
 pub use proxy::proxy;
+
+pub use windows::{
+    Win32::Foundation::HINSTANCE, Win32::System::SystemServices::DLL_PROCESS_ATTACH,
+};
