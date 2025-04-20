@@ -62,7 +62,7 @@ pub fn proxy(_attribute: TokenStream, function: TokenStream) -> TokenStream {
             #vis #unsafety #abi #constness fn #ident() #output #block
 
             //turn the original function into DllMain
-            #[no_mangle]
+            #[unsafe(no_mangle)]
             #[allow(non_snake_case)]
             pub extern "system" fn DllMain(
                 _hinstDLL: proxy_dll::HINSTANCE,
