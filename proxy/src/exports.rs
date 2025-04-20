@@ -48,8 +48,8 @@ pub enum ExportError {
     GetModuleName,
     /// Proxy has an invalid file name
     InvalidFileName,
-    /// A string error
-    Misc(&'static str),
+    /// GetModuleFileNameW failed
+    GetModuleFileNameWFailed,
 }
 
 const EXPORTS_VERSION: [&'static [u8]; 17] = [
@@ -309,7 +309,7 @@ impl ProxyDll for HINSTANCE {
         };
 
         match len {
-            0 => Err(ExportError::Misc("GetModuleFileNameW failed")),
+            0 => Err(ExportError::GetModuleFileNameWFailed),
             _ => Ok(PathBuf::from(String::from_utf16_lossy(
                 &path[..len as usize],
             ))),
