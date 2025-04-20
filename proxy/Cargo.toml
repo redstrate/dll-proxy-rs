@@ -9,7 +9,6 @@ license = "GPL-2.0"
 readme = "../README.md"
 
 [dependencies]
-thiserror = "1.0.37"
 proxy-sys = { path = "../proxy-sys" }
 
 [target.'cfg(windows)'.dependencies]

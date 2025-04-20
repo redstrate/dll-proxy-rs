@@ -2,12 +2,10 @@
 
 use std::{
     arch::global_asm,
-    error,
     ffi::{CStr, CString},
     path::{Path, PathBuf},
 };
 
-use thiserror::Error;
 use winapi::{
     shared::minwindef::{FARPROC, HINSTANCE},
     um::libloaderapi::{GetProcAddress, LoadLibraryA},
@@ -37,18 +35,21 @@ global_asm!(include_str!("../deps/winmm.x64.S"));
 #[cfg(target_pointer_width = "32")]
 global_asm!(include_str!("../deps/winmm.x86.S"));
 
-#[derive(Debug, Error)]
-enum ExportError {
-    #[error("Failed to find original library")]
+/// Error on export
+#[derive(Debug)]
+pub enum ExportError {
+    /// Failed to find original library
     LibraryNotFound,
-    #[error("Failed to load library")]
+    /// Failed to load library
     LoadLibrary,
-    #[error("Failed to get module path")]
+    /// Failed to get module path
     GetModulePath,
-    #[error("Failed to get module name")]
+    /// Failed to get module name
     GetModuleName,
-    #[error("Proxy has an invalid file name")]
+    /// Proxy has an invalid file name
     InvalidFileName,
+    /// A string error
+    Misc(&'static str),
 }
 
 const EXPORTS_VERSION: [&'static [u8]; 17] = [
@@ -287,17 +288,17 @@ const EXPORTS_WINMM: [&'static [u8]; 181] = [
 /// A few helper functions for HINSTANCE
 pub trait ProxyDll {
     /// retrieves the path of the module
-    fn get_path(&self) -> Result<PathBuf, Box<dyn error::Error>>;
+    fn get_path(&self) -> Result<PathBuf, ExportError>;
     /// retrieves the name of the module
-    fn get_file_name(&self) -> Result<String, Box<dyn error::Error>>;
+    fn get_file_name(&self) -> Result<String, ExportError>;
     /// checks if the current name is a supported system dll
-    fn is_compatible(&self) -> Result<bool, Box<dyn error::Error>>;
+    fn is_compatible(&self) -> Result<bool, ExportError>;
     /// loads the original dll from system32
-    fn load_original(&self) -> Result<HINSTANCE, Box<dyn error::Error>>;
+    fn load_original(&self) -> Result<HINSTANCE, ExportError>;
 }
 
 impl ProxyDll for HINSTANCE {
-    fn get_path(&self) -> Result<PathBuf, Box<dyn error::Error>> {
+    fn get_path(&self) -> Result<PathBuf, ExportError> {
         let mut path = [0u16; 260];
         let len = unsafe {
             winapi::um::libloaderapi::GetModuleFileNameW(
@@ -308,27 +309,27 @@ impl ProxyDll for HINSTANCE {
         };
 
         match len {
-            0 => Err("GetModuleFileNameW failed".into()),
+            0 => Err(ExportError::Misc("GetModuleFileNameW failed")),
             _ => Ok(PathBuf::from(String::from_utf16_lossy(
                 &path[..len as usize],
             ))),
         }
     }
 
-    fn get_file_name(&self) -> Result<String, Box<dyn error::Error>> {
+    fn get_file_name(&self) -> Result<String, ExportError> {
         let path = self.get_path()?;
         let file_name = path.file_name().ok_or(ExportError::GetModuleName)?;
         let file_name = file_name.to_str().ok_or(ExportError::GetModuleName)?;
         Ok(file_name.to_lowercase().to_string())
     }
 
-    fn is_compatible(&self) -> Result<bool, Box<dyn error::Error>> {
+    fn is_compatible(&self) -> Result<bool, ExportError> {
         let file_name = self.get_file_name()?;
 
         Ok(file_name.eq("version.dll") || file_name.eq("winhttp.dll") || file_name.eq("winmm.dll"))
     }
 
-    fn load_original(&self) -> Result<HINSTANCE, Box<dyn error::Error>> {
+    fn load_original(&self) -> Result<HINSTANCE, ExportError> {
         if !self.is_compatible()? {
             return Err(ExportError::InvalidFileName.into());
         }
@@ -361,9 +362,9 @@ impl ProxyDll for HINSTANCE {
 /// # Safety
 ///
 /// this function is unsafe.
-pub fn initialize(module: HINSTANCE) -> Result<(), Box<dyn error::Error>> {
+pub fn initialize(module: HINSTANCE) -> Result<(), ExportError> {
     if module.is_null() {
-        return Err(Box::new(ExportError::LoadLibrary));
+        return Err(ExportError::LoadLibrary);
     }
 
     let original = module.load_original()?;
@@ -374,7 +375,7 @@ pub fn initialize(module: HINSTANCE) -> Result<(), Box<dyn error::Error>> {
         "version.dll" => EXPORTS_VERSION.to_vec(),
         "winhttp.dll" => EXPORTS_WINHTTP.to_vec(),
         "winmm.dll" => EXPORTS_WINMM.to_vec(),
-        _ => return Err(Box::new(ExportError::InvalidFileName)),
+        _ => return Err(ExportError::InvalidFileName),
     };
 
     for (index, export) in exports.iter().enumerate() {
@@ -393,7 +394,7 @@ pub fn initialize(module: HINSTANCE) -> Result<(), Box<dyn error::Error>> {
                 OriginalFuncs_winmm[index] = GetProcAddress(original, export);
             },
 
-            _ => return Err(Box::new(ExportError::InvalidFileName)),
+            _ => return Err(ExportError::InvalidFileName),
         }
     }
 
