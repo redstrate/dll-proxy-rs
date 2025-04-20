@@ -9,6 +9,7 @@
 //! - Windows
 //!     - `x86_64-pc-windows-msvc`
 //!     - `i686-pc-windows-msvc`
+//!     - `x86_64-pc-windows-gnu`
 //!
 //! # Safety
 //!
