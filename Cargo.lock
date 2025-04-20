@@ -35,7 +35,7 @@ dependencies = [
 name = "proxy-sys"
 version = "0.2.2"
 dependencies = [
- "syn 1.0.109",
+ "syn 2.0.100",
 ]
 
 [[package]]
