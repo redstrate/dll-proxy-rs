@@ -45,8 +45,3 @@
 pub mod exports;
 
 pub use proxy::proxy;
-
-pub use winapi::{
-    shared::minwindef::{BOOL, DWORD, HINSTANCE, LPVOID, TRUE},
-    um::winnt::DLL_PROCESS_ATTACH,
-};

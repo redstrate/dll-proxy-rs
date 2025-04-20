@@ -6,19 +6,16 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use winapi::{
-    shared::minwindef::{FARPROC, HINSTANCE},
-    um::libloaderapi::{GetProcAddress, LoadLibraryA},
-};
+use windows::{Win32::Foundation::*, Win32::System::LibraryLoader::*, core::PCSTR};
 
 #[unsafe(no_mangle)]
-static mut OriginalFuncs_version: [FARPROC; 17] = [0 as FARPROC; 17];
+static mut OriginalFuncs_version: [FARPROC; 17] = [None; 17];
 
 #[unsafe(no_mangle)]
-static mut OriginalFuncs_winhttp: [FARPROC; 65] = [0 as FARPROC; 65];
+static mut OriginalFuncs_winhttp: [FARPROC; 65] = [None; 65];
 
 #[unsafe(no_mangle)]
-static mut OriginalFuncs_winmm: [FARPROC; 181] = [0 as FARPROC; 181];
+static mut OriginalFuncs_winmm: [FARPROC; 181] = [None; 181];
 
 #[cfg(target_pointer_width = "64")]
 global_asm!(include_str!("../deps/version.x64.S"));
@@ -60,7 +57,7 @@ impl std::fmt::Display for ExportError {
             Self::GetModulePath => "Failed to get module path",
             Self::GetModuleName => "Failed to get module name",
             Self::InvalidFileName => "Proxy has an invalid file name",
-            Self::GetModuleFileNameWFailed => "GetModuleFileNameW failed"
+            Self::GetModuleFileNameWFailed => "GetModuleFileNameW failed",
         };
         write!(f, "{}", msg)
     }
@@ -314,13 +311,7 @@ pub trait ProxyDll {
 impl ProxyDll for HINSTANCE {
     fn get_path(&self) -> Result<PathBuf, ExportError> {
         let mut path = [0u16; 260];
-        let len = unsafe {
-            winapi::um::libloaderapi::GetModuleFileNameW(
-                *self,
-                path.as_mut_ptr(),
-                path.len() as u32,
-            )
-        };
+        let len = unsafe { GetModuleFileNameW(Some((*self).into()), &mut path) };
 
         match len {
             0 => Err(ExportError::GetModuleFileNameWFailed),
@@ -357,7 +348,10 @@ impl ProxyDll for HINSTANCE {
             true => unsafe {
                 let path_str = path.to_str().ok_or_else(|| ExportError::GetModulePath)?;
                 let path_cstr = CString::new(path_str).map_err(|_| ExportError::GetModulePath)?;
-                Ok(LoadLibraryA(path_cstr.as_ptr()))
+                // TODO: don't unwrap here, instead map the err
+                Ok(LoadLibraryA(PCSTR(path_cstr.as_ptr() as *const u8))
+                    .unwrap()
+                    .into())
             },
 
             false => Err(ExportError::LibraryNotFound.into()),
@@ -377,7 +371,7 @@ impl ProxyDll for HINSTANCE {
 ///
 /// this function is unsafe.
 pub fn initialize(module: HINSTANCE) -> Result<(), ExportError> {
-    if module.is_null() {
+    if module.is_invalid() {
         return Err(ExportError::LoadLibrary);
     }
 
@@ -397,15 +391,18 @@ pub fn initialize(module: HINSTANCE) -> Result<(), ExportError> {
 
         match name.as_str() {
             "version.dll" => unsafe {
-                OriginalFuncs_version[index] = GetProcAddress(original, export);
+                OriginalFuncs_version[index] =
+                    GetProcAddress(original.into(), PCSTR(export as *const u8));
             },
 
             "winhttp.dll" => unsafe {
-                OriginalFuncs_winhttp[index] = GetProcAddress(original, export);
+                OriginalFuncs_winhttp[index] =
+                    GetProcAddress(original.into(), PCSTR(export as *const u8));
             },
 
             "winmm.dll" => unsafe {
-                OriginalFuncs_winmm[index] = GetProcAddress(original, export);
+                OriginalFuncs_winmm[index] =
+                    GetProcAddress(original.into(), PCSTR(export as *const u8));
             },
 
             _ => return Err(ExportError::InvalidFileName),
