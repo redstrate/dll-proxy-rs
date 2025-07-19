@@ -375,9 +375,9 @@ pub fn initialize(module: HINSTANCE) -> Result<(), ExportError> {
         return Err(ExportError::LoadLibrary);
     }
 
-    let original = module.load_original()?;
+    let original = module.load_original().unwrap();
 
-    let name = module.get_file_name()?;
+    let name = module.get_file_name().unwrap();
 
     let exports = match name.as_str() {
         "version.dll" => EXPORTS_VERSION.to_vec(),

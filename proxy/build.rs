@@ -5,7 +5,7 @@
 /// #[used]
 /// #[link_section = ".drectve"]
 /// #[cfg(all(windows, target_env = "msvc"))]
-/// static DEF_ARG: [u8; 27] = *b"/DEF:proxy/deps/Exports.def";
+/// static DEF_ARG: [u8; 27] = *b"/DEF:proxy/deps/Exports.def";b  v
 /// ```
 ///
 /// was suggested, however this does not seem to be a viable option, the linker seems to swallow this.

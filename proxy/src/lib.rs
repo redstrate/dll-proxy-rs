@@ -26,7 +26,6 @@
 //!
 //! This crate is pretty unsafe
 
-#![feature(naked_functions)]
 #![deny(
     missing_debug_implementations,
     missing_docs,

@@ -1,52 +1,52 @@
-.globl GetFileVersionInfoA
-.globl GetFileVersionInfoByHandle
-.globl GetFileVersionInfoExA
-.globl GetFileVersionInfoExW
-.globl GetFileVersionInfoSizeA
-.globl GetFileVersionInfoSizeExA
-.globl GetFileVersionInfoSizeExW
-.globl GetFileVersionInfoSizeW
-.globl GetFileVersionInfoW
-.globl VerFindFileA
-.globl VerFindFileW
-.globl VerInstallFileA
-.globl VerInstallFileW
-.globl VerLanguageNameA
-.globl VerLanguageNameW
-.globl VerQueryValueA
-.globl VerQueryValueW
+.globl _GetFileVersionInfoA
+.globl _GetFileVersionInfoByHandle
+.globl _GetFileVersionInfoExA
+.globl _GetFileVersionInfoExW
+.globl _GetFileVersionInfoSizeA
+.globl _GetFileVersionInfoSizeExA
+.globl _GetFileVersionInfoSizeExW
+.globl _GetFileVersionInfoSizeW
+.globl _GetFileVersionInfoW
+.globl _VerFindFileA
+.globl _VerFindFileW
+.globl _VerInstallFileA
+.globl _VerInstallFileW
+.globl _VerLanguageNameA
+.globl _VerLanguageNameW
+.globl _VerQueryValueA
+.globl _VerQueryValueW
 
-GetFileVersionInfoA:
+_GetFileVersionInfoA:
     jmp ds:[_OriginalFuncs_version + 0 * 4]
-GetFileVersionInfoByHandle:
+_GetFileVersionInfoByHandle:
     jmp ds:[_OriginalFuncs_version + 1 * 4]
-GetFileVersionInfoExA:
+_GetFileVersionInfoExA:
     jmp ds:[_OriginalFuncs_version + 2 * 4]
-GetFileVersionInfoExW:
+_GetFileVersionInfoExW:
     jmp ds:[_OriginalFuncs_version + 3 * 4]
-GetFileVersionInfoSizeA:
+_GetFileVersionInfoSizeA:
     jmp ds:[_OriginalFuncs_version + 4 * 4]
-GetFileVersionInfoSizeExA:
+_GetFileVersionInfoSizeExA:
     jmp ds:[_OriginalFuncs_version + 5 * 4]
-GetFileVersionInfoSizeExW:
+_GetFileVersionInfoSizeExW:
     jmp ds:[_OriginalFuncs_version + 6 * 4]
-GetFileVersionInfoSizeW:
+_GetFileVersionInfoSizeW:
     jmp ds:[_OriginalFuncs_version + 7 * 4]
-GetFileVersionInfoW:
+_GetFileVersionInfoW:
     jmp ds:[_OriginalFuncs_version + 4 * 4]
-VerFindFileA:
+_VerFindFileA:
     jmp ds:[_OriginalFuncs_version + 9 * 4]
-VerFindFileW:
+_VerFindFileW:
     jmp ds:[_OriginalFuncs_version + 10 * 4]
-VerInstallFileA:
+_VerInstallFileA:
     jmp ds:[_OriginalFuncs_version + 11 * 4]
-VerInstallFileW:
+_VerInstallFileW:
     jmp ds:[_OriginalFuncs_version + 12 * 4]
-VerLanguageNameA:
+_VerLanguageNameA:
     jmp ds:[_OriginalFuncs_version + 13 * 4]
-VerLanguageNameW:
+_VerLanguageNameW:
     jmp ds:[_OriginalFuncs_version + 14 * 4]
-VerQueryValueA:
+_VerQueryValueA:
     jmp ds:[_OriginalFuncs_version + 15 * 4]
-VerQueryValueW:
+_VerQueryValueW:
     jmp ds:[_OriginalFuncs_version + 16 * 4]
