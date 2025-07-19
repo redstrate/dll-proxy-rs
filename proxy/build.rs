@@ -14,5 +14,10 @@ fn main() {
     use std::path::Path;
     let lib_path = Path::new("deps").join("Exports.def");
     let absolute_path = std::fs::canonicalize(&lib_path).unwrap();
-    println!("cargo:rustc-cdylib-link-arg={}", absolute_path.display());
+
+    if cfg!(target_env = "gnu"){
+        println!("cargo:rustc-cdylib-link-arg={}", absolute_path.display());
+    } else {
+        println!("cargo:rustc-cdylib-link-arg=/DEF:{}", absolute_path.display());
+    }
 }
